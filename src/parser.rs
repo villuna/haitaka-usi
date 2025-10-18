@@ -96,10 +96,17 @@ impl GuiMessage {
     /// assert_eq!(msg, GuiMessage::Usi);
     /// ```
     pub fn parse(input: &str) -> Result<Self, PestError<Rule>> {
-        match UsiParser::parse(Rule::start, input) {
-            Ok(pairs) => Ok(Self::inner_parse(pairs.into_iter().next().unwrap())),
-            Err(err) => Err(err),
-        }
+        UsiParser::parse(Rule::start, input)
+            .map(|pairs| Self::inner_parse(pairs.into_iter().next().unwrap()))
+    }
+
+    /// Parse one USI message, sent by the GUI and recieved by the Engine.
+    ///
+    /// If the string contains multiple messages, only the first one is returned. This function
+    /// differs from [GuiMessage::parse] as it does not require the
+    pub fn parse_no_nl(input: &str) -> Result<Self, PestError<Rule>> {
+        UsiParser::parse(Rule::delimited_message_no_nl, input)
+            .map(|pairs| Self::inner_parse(pairs.into_iter().next().unwrap()))
     }
 
     /// Parses the input and returns the first valid protocol GUI message, skipping Unknowns.
@@ -401,10 +408,13 @@ impl EngineMessage {
     /// );
     /// ```
     pub fn parse(input: &str) -> Result<Self, PestError<Rule>> {
-        match UsiParser::parse(Rule::start, input) {
-            Ok(pairs) => Ok(Self::inner_parse(pairs.into_iter().next().unwrap())),
-            Err(err) => Err(err),
-        }
+        UsiParser::parse(Rule::start, input)
+            .map(|pairs| Self::inner_parse(pairs.into_iter().next().unwrap()))
+    }
+
+    pub fn parse_no_nl(input: &str) -> Result<Self, PestError<Rule>> {
+        UsiParser::parse(Rule::delimited_message_no_nl, input)
+            .map(|pairs| Self::inner_parse(pairs.into_iter().next().unwrap()))
     }
 
     /// Parses the input and returns the first valid protocol Engine message, skipping Unknowns.

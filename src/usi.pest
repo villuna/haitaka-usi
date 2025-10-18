@@ -79,7 +79,8 @@ SEP = _{"/"}
 start = _{SOI ~ line+ ~ &EOI}
 line = _{ other? ~ (delimited_message | junk) }
 
-delimited_message = _{ NL* ~ message ~ WHITESPACE* ~ NEWLINE }
+delimited_message_no_nl = _{ NL* ~ message ~ WHITESPACE* }
+delimited_message = _{ delimited_message_no_nl ~ NEWLINE }
 
 message = _{ gui_message | engine_message | other}
 
@@ -119,7 +120,7 @@ engine_message = _{
 // GuiMessage: GUI to engine
 //
 
-usi = ${ "usi" ~ &NL }
+usi = ${ "usi" ~ &(NL | EOI) }
 
 debug = ${ "debug" ~ (WS ~ ("on" | "off"))?  }
 
